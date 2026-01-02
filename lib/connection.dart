@@ -6,6 +6,8 @@ import 'data/beacons.dart';
 import 'services/bluetooth_scan_service.dart';
 import 'utils/beacon_utils.dart';
 import 'data/sections.dart';
+import 'models/beacon.dart';
+import 'models/beacon_measured.dart';
 
 class BackgroundPage extends StatelessWidget {
   const BackgroundPage({Key? key}) : super(key: key);
@@ -81,7 +83,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
     final id = _devices.first.device.id.id;
     final place = Beacons.getNameById(id);
 
-    return Beacons.placeColors[place] ?? _bgColor;
+    return Sections.sections[0].color ?? _bgColor;
   }
 
   @override
