@@ -5,6 +5,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'data/beacons.dart';
 import 'services/bluetooth_scan_service.dart';
 import 'utils/beacon_utils.dart';
+import 'data/sections.dart';
 
 class BackgroundPage extends StatelessWidget {
   const BackgroundPage({Key? key}) : super(key: key);
@@ -39,7 +40,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   @override
   void initState() {
     super.initState();
-    _allowedIds = Beacons.beacons.keys.toList();
+    _allowedIds = Beacons.getAllIds();
 
     _startScan();
     _timer = Timer.periodic(
@@ -78,7 +79,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
     if (_devices.isEmpty) return _bgColor;
 
     final id = _devices.first.device.id.id;
-    final place = Beacons.beacons[id];
+    final place = Beacons.getNameById(id);
 
     return Beacons.placeColors[place] ?? _bgColor;
   }
@@ -107,7 +108,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
                 final r = _devices[index];
                 final name = r.device.name.isNotEmpty ? r.device.name : 'Unbenannt';
                 final id = r.device.id.id;
-                final place = Beacons.beacons[id];
+                final place = Beacons.getNameById(id);
                 final d =
                     BeaconUtils.calculateDistance(r.rssi);
 
