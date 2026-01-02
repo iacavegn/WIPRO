@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-import 'models/beacons.dart';
+import 'data/beacons.dart';
 import 'services/bluetooth_scan_service.dart';
 import 'utils/beacon_utils.dart';
 
