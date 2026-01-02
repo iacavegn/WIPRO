@@ -1,0 +1,11 @@
+[
+  {
+    "name": "A",
+    "beacon-distances": {
+        "a": "close", 
+        "b": "far",
+        "c": "",
+        "d": ""
+    }
+  }
+]
