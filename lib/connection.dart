@@ -4,7 +4,6 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'data/beacons.dart';
 import 'services/bluetooth_scan_service.dart';
-import 'utils/beacon_utils.dart';
 import 'data/sections.dart';
 import 'models/beacon.dart';
 import 'models/beacon_measured.dart';
@@ -31,7 +30,7 @@ class BluetoothScannerPage extends StatefulWidget {
 
 class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   final _scanService = BluetoothScanService();
-  final List<ScanResult> _devices = [];
+  final List<BeaconMeasured> _beacons = [];
 
   bool _isScanning = false;
   Color _bgColor = Colors.white;
@@ -45,10 +44,10 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
     _allowedIds = Beacons.getAllIds();
 
     _startScan();
-    _timer = Timer.periodic(
-      const Duration(milliseconds: 1100),
+    /*_timer = Timer.periodic(
+      const Duration(milliseconds: 4000),
       (_) => _startScan(),
-    );
+    );*/
   }
 
   @override
@@ -68,9 +67,11 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
       },
       onResults: (results) {
         setState(() {
-          _devices
+          _beacons
             ..clear()
-            ..addAll(results);
+            ..addAll(
+              results.map((b) => BeaconMeasured(Beacons.getById(b.device.id.id)!, b.rssi)),
+            );
           _bgColor = _getBackgroundColor();
         });
       },
@@ -78,46 +79,36 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   }
 
   Color _getBackgroundColor() {
-    if (_devices.isEmpty) return _bgColor;
-
-    final id = _devices.first.device.id.id;
-    final place = Beacons.getNameById(id);
-
-    return Sections.sections[0].color ?? _bgColor;
+    if (_beacons.isEmpty) return _bgColor;
+    if (_beacons.length < Beacons.beacons.length) {
+      return _bgColor;
+    } else {
+      return Sections.sections[1].color ?? _bgColor;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bgColor,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon:
-                Icon(_isScanning ? Icons.stop : Icons.search),
-            onPressed:
-                _isScanning ? _scanService.stopScan : _startScan,
-          ),
-        ],
-      ),
       body: Column(
         children: [
-          if (_isScanning) const LinearProgressIndicator(),
           Expanded(
             child: ListView.builder(
-              itemCount: _devices.length,
+              itemCount: _beacons.length,
               itemBuilder: (_, index) {
-                final r = _devices[index];
-                final name = r.device.name.isNotEmpty ? r.device.name : 'Unbenannt';
-                final id = r.device.id.id;
-                final place = Beacons.getNameById(id);
-                final d =
-                    BeaconUtils.calculateDistance(r.rssi);
+                final b = _beacons[index];
+                final beacon = b.beacon;
+                final name = beacon.name;
+                final id = beacon.id;
+                final place = beacon.name;
+                final d = b.distance;
+                final rssi = b.rssi;
 
                 return ListTile(
-                  title: Text(place != null ? place : 'Unbekannt'),
+                  title: Text(place),
                   subtitle: Text(
-                      'RSSI: ${r.rssi} | Distanz: ${d.toStringAsFixed(2)} - ${name}'),
+                      'RSSI: ${rssi} | Distanz: ${d.toStringAsFixed(2)} - ${name}'),
                 );
               },
             ),

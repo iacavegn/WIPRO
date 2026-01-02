@@ -26,6 +26,12 @@ class Beacons {
     );
   }
 
+  static Beacon? getById(String id) {
+    return beacons?.firstWhere(
+      (b) => b.id == id
+    );
+  }
+
   static const Map<String, int> rssiAt1m = {
     "a": -65,
     "b": -65,
