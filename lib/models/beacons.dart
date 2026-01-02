@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BeaconConfig {
+class Beacons {
   static const Map<String, String> beacons = {
     "E9683774-D2D7-518F-B59B-C09555934BBB": "a",
     "137BDCDD-112B-09BC-7F96-5CB779877BCD": "b",
