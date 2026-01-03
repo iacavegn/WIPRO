@@ -12,5 +12,13 @@ class Beacon {
   );
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Beacon && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
   String toString() => 'Beacon(id: $id, name: $name, rssiAt1m: $rssiAt1m)';
 }

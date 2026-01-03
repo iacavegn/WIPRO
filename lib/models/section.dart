@@ -11,4 +11,10 @@ class Section {
         this.beaconsWithDistances,
         this.color,
     );
+
+    List<Beacon> getSortedBeacons() {
+        final entries = beaconsWithDistances.entries.toList();
+        entries.sort((a, b) => a.value.compareTo(b.value));
+        return entries.map((e) => e.key).toList();
+    }
 }

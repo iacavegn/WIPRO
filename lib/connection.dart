@@ -44,10 +44,6 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
     _allowedIds = Beacons.getAllIds();
 
     _startScan();
-    /*_timer = Timer.periodic(
-      const Duration(milliseconds: 4000),
-      (_) => _startScan(),
-    );*/
   }
 
   @override
@@ -83,7 +79,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
     if (_beacons.length < Beacons.beacons.length) {
       return _bgColor;
     } else {
-      return Sections.sections[1].color ?? _bgColor;
+      return Sections.getSection(_beacons)?.color ?? _bgColor;
     }
   }
 
