@@ -21,14 +21,14 @@ class Sections {
     static final c = Beacons.getByName("c")!;
     static final d = Beacons.getByName("d")!;
 
-    static List<Section> sections_A_C_G_I = [
+    static List<Section> sections = [
         Section("A", {a: 0,b: 2,c: 2,d: 3, }, Colors.red),
         Section("C", {a: 2,b: 0,c: 3,d: 2, }, Colors.yellow),
         Section("G", {a: 2,b: 3,c: 0,d: 2, }, Colors.purple),
         Section("I", {a: 3,b: 2,c: 2,d: 1, }, Colors.brown),
     ];
 
-    static List<Section> sections = [
+    static List<Section> sectionsB = [
         Section("A", {a: 0,b: 2,c: 2,d: 3, }, Colors.red),
         Section("B", {a: 1,b: 1,c: 2,d: 2, }, Colors.orange),
         Section("C", {a: 2,b: 0,c: 3,d: 2, }, Colors.yellow),
@@ -46,6 +46,9 @@ class Sections {
         others.sort((a, b) => b.rssi.compareTo(a.rssi));
         List<Beacon> bs = others.map((bm) => bm.beacon).toList();
 
+        print(others.map((b) => b.distance).join(', '));
+        print(bs.map((b) => b.name).join(', '));
+
         for (final section in sections) {
             if (listEquals(section.getSortedBeacons(), bs)) {
                 return section;
@@ -55,5 +58,4 @@ class Sections {
         
         return null;
     }
-
 }
