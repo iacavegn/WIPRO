@@ -12,8 +12,9 @@ class BeaconMeasured {
         this.rssi,
     ): distance = calculateDistance(rssi, beacon.rssiAt1m);
 
+    //
     static double calculateDistance(int rssi, int txPower) {
-        const int n = 2;
+        const int n = 5;
         return pow(10, (txPower - rssi) / (10 * n)).toDouble();
     }
 }
