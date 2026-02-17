@@ -13,8 +13,8 @@ class BluetoothScanService {
     required void Function(List<ScanResult>) onResults,
     required void Function(bool) onScanningChanged,
     required bool Function(String id) filter,
-    Duration timeout = const Duration(seconds: 1),
-    Duration pauseBetweenScans = const Duration(seconds: 1),
+    Duration timeout = const Duration(seconds: 10),
+    Duration pauseBetweenScans = const Duration(seconds: 10),
   }) async {
     _disposed = false;
 
@@ -38,6 +38,7 @@ class BluetoothScanService {
     // Endlosschleife für kontinuierliches Scannen
     while (!_disposed) {
       try {
+        print("Scan gestartet");
         await FlutterBluePlus.startScan(timeout: timeout);
       } catch (e) {
         print("Scan-Fehler: $e");
