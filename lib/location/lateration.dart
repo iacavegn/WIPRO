@@ -14,16 +14,11 @@ import '/data/beacon_layouts.dart';
 /// - Distances are noisy / inconsistent (real-world sensors)
 /// - The tracked object always has a fixed height (e.g. z = 1.0)
 class Lateration {
-  final double fixedZ;
-  final int iterations;
-  final double learningRate;
-  const Lateration({
-    this.fixedZ = 0.0,
-    this.iterations = 800,
-    this.learningRate = 0.01,
-  });
+  static final double fixedZ = 1.0; // Feste Höhe für die spätere Berechnung
+  static final int iterations = 800;
+  static final double learningRate = 0.01;
 
-  Point solve(List<BeaconMeasured> beaconMeasurements) {
+  static Point solve(List<BeaconMeasured> beaconMeasurements) {
     if (beaconMeasurements.length < 3) {
       throw ArgumentError('At least 3 beacon measurements are required for lateration.');
     }
@@ -63,12 +58,12 @@ class Lateration {
     return Point(x, y);
   }
 
-  getPointFromDistancesAs1to120(List<BeaconMeasured> beaconMeasurements) {
+  static Point getPointFromDistancesAs1to120(List<BeaconMeasured> beaconMeasurements) {
     final position = solve(beaconMeasurements);
     return Point(position.x.abs() * 1.2, position.y.abs() * 1.2);
   }
 
-  Point _centroid2D(List<BeaconMeasured> beaconMeasurements) {
+  static Point _centroid2D(List<BeaconMeasured> beaconMeasurements) {
     double sumX = 0.0;
     double sumY = 0.0;
 
