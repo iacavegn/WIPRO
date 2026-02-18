@@ -14,7 +14,7 @@ class BeaconMeasured {
 
     //
     static double calculateDistance(int rssi, int txPower) {
-        const int n = 2;
+        const int n = 3;
         return pow(10, (txPower - rssi) / (10 * n)).toDouble();
     }
 }

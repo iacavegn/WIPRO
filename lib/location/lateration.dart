@@ -4,6 +4,7 @@ import '/data/beacons.dart';
 import '/models/beacon.dart';
 import '/models/beacon_measured.dart';
 import '/models/point3d.dart';
+import '/data/beacon_layouts.dart';
 
 
 /// Lateration solver for 3D anchors with a fixed tag height.
@@ -19,7 +20,7 @@ class Lateration {
   const Lateration({
     this.fixedZ = 0.0,
     this.iterations = 800,
-    this.learningRate = 0.03,
+    this.learningRate = 0.01,
   });
 
   Point solve(List<BeaconMeasured> beaconMeasurements) {
@@ -46,17 +47,25 @@ class Lateration {
 
         if (predictedDist == 0) continue;
 
-        final error = predictedDist - beaconMeasure.distance;
+        final predictedPercentage = predictedDist / BeaconsLayout.getMaxDistance();
+        final measuredPercentage = (beaconMeasure.distance / BeaconsLayout.getMaxDistance()).clamp(0.0, 1.0);
+    
+        final errorPercentage = (predictedPercentage - measuredPercentage).abs() / measuredPercentage;
 
-        gradX += (error * dx) / predictedDist;
-        gradY += (error * dy) / predictedDist;
+        gradX += ((errorPercentage * dx) / predictedPercentage) ;
+        gradY += ((errorPercentage * dy) / predictedPercentage);
       }
 
       x -= learningRate * gradX;
       y -= learningRate * gradY;
     }
-
+    
     return Point(x, y);
+  }
+
+  getPointFromDistancesAs1to120(List<BeaconMeasured> beaconMeasurements) {
+    final position = solve(beaconMeasurements);
+    return Point(position.x.abs() * 1.2, position.y.abs() * 1.2);
   }
 
   Point _centroid2D(List<BeaconMeasured> beaconMeasurements) {
@@ -68,6 +77,6 @@ class Lateration {
       sumY += beaconMeasured.beacon.coordinates.y;
     } 
 
-    return Point((sumX / beaconMeasurements.length).abs(), (sumY / beaconMeasurements.length).abs());
+    return Point((sumX / beaconMeasurements.length), (sumY / beaconMeasurements.length));
   }
 }

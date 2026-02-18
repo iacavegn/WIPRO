@@ -26,15 +26,15 @@ class Sections {
     static final d = Beacons.getByName("d")!;
 
     static List<Section> sections = [
-        Section("A", Square(Point(  0,   0), Point( 30, 30)), Colors.red),
-        Section("B", Square(Point( 30,   0), Point( 60, 30)), Colors.orange),
-        Section("C", Square(Point( 60,   0), Point( 90, 30)), Colors.yellow),
-        Section("D", Square(Point(  0,   0), Point( 30, 60)), Colors.green),
-        Section("E", Square(Point( 30,   0), Point( 60, 60)), Colors.blue),
-        Section("F", Square(Point( 60,   0), Point( 90, 60)), Colors.indigo),
-        Section("G", Square(Point(  0,   0), Point( 30, 90)), Colors.purple),
-        Section("H", Square(Point( 30,   0), Point( 60, 90)), Colors.teal),
-        Section("I", Square(Point( 60,   0), Point( 90, 90)), Colors.brown),
+        Section("A", Square(Point(  0,   0), Point( 40,  40)), Colors.red),
+        Section("B", Square(Point( 40,   0), Point( 80,  40)), Colors.orange),
+        Section("C", Square(Point( 80,   0), Point(120,  40)), Colors.yellow),
+        Section("D", Square(Point(  0,  40), Point( 40,  80)), Colors.green),
+        Section("E", Square(Point( 40,  40), Point( 80,  80)), Colors.blue),
+        Section("F", Square(Point( 80,  40), Point(120,  80)), Colors.indigo),
+        Section("G", Square(Point(  0,  80), Point( 40, 120)), Colors.purple),
+        Section("H", Square(Point( 40,  80), Point( 80, 120)), Colors.teal),
+        Section("I", Square(Point( 80,  80), Point(120, 120)), Colors.brown),
     ];
 
     static Section? getSection(List<BeaconMeasured> others) {
@@ -46,7 +46,7 @@ class Sections {
         });
 
         final lateration = Lateration();
-        final position = lateration.solve(others);
+        final position = lateration.getPointFromDistancesAs1to120(others);
         print("Position: $position");
 
         for (final section in sections) {

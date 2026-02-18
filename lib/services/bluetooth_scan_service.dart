@@ -13,8 +13,8 @@ class BluetoothScanService {
     required void Function(List<ScanResult>) onResults,
     required void Function(bool) onScanningChanged,
     required bool Function(String id) filter,
-    Duration timeout = const Duration(seconds: 10),
-    Duration pauseBetweenScans = const Duration(seconds: 10),
+    Duration timeout = const Duration(seconds: 1),
+    Duration pauseBetweenScans = const Duration(seconds: 1),
   }) async {
     _disposed = false;
 
