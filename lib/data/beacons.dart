@@ -38,11 +38,4 @@ class Beacons {
     "c": -65,
     "d": -70,
   };
-
-  static const Map<String, Color> placeColors = {
-    "a": Colors.red,
-    "b": Colors.green,
-    "c": Colors.blue,
-    "d": Colors.purple,
-  };
 }

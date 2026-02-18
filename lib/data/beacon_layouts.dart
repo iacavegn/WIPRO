@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import '/models/point3d.dart';
 
 /*    x
  |a--|---|--b|
@@ -12,39 +13,29 @@ y|   |   |   |
 */
 
 class BeaconsLayout {
-    static const Map<String, List<int>> coordinates = {
-        "a": [0, 0, 0],
-        "b": [0, 20, 0],
-        "c": [20, 0, 0],
-        "d": [20, 20, 0],
+    static const Map<String, Point3d> coordinates = {
+        "a": Point3d(0, 0, 0),
+        "b": Point3d(0, 20, 0),
+        "c": Point3d(20, 0, 0),
+        "d": Point3d(20, 20, 0),
     };
 
     static double getDistance(String firstBeacon, String secondBeacon) {
-        List<int> coordinatesFirst = coordinates[firstBeacon] ?? [0, 0, 0];
-        List<int> coordinatesSecond = coordinates[secondBeacon] ?? [0, 0, 0];
-        int xFirst = coordinatesFirst[0];
-        int yFirst = coordinatesFirst[1];
-        int zFirst = coordinatesFirst[2];
-        int xSecond = coordinatesSecond[0];
-        int ySecond = coordinatesSecond[1];
-        int zSecond = coordinatesSecond[2];
-    
-        return sqrt(
-            pow(xFirst - xSecond, 2) +
-            pow(yFirst - ySecond, 2) +
-            pow(zFirst - zSecond, 2)
-        );
+        final firstCoords = coordinates[firstBeacon];
+        final secondCoords = coordinates[secondBeacon];
+        if (firstCoords == null || secondCoords == null) {
+            throw ArgumentError('Invalid beacon names: $firstBeacon, $secondBeacon');
+        }
+        return firstCoords.distanceTo(secondCoords);
     }
 
     static double getMaxDistance() {
-        double maxDistance = 0.0;
-        for (final firstBeacon in coordinates.keys) {
-            for (final secondBeacon in coordinates.keys) {
-                if (firstBeacon != secondBeacon) {
-                    double distance = getDistance(firstBeacon, secondBeacon);
-                    if (distance > maxDistance) {
-                        maxDistance = distance;
-                    }
+        double maxDistance = 0;
+        for (final coord1 in coordinates.values) {
+            for (final coord2 in coordinates.values) {
+                final distance = coord1.distanceTo(coord2);
+                if (distance > maxDistance) {
+                    maxDistance = distance;
                 }
             }
         }

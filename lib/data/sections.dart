@@ -48,10 +48,11 @@ class Sections {
         List<Beacon> bs = others.map((bm) => bm.beacon).toList();
 
         var maxDistance = BeaconsLayout.getMaxDistance();
-        
-        var procentualDistances = others.map((bm) => (bm.distance / maxDistance * 100)).toList();
-        print("Prozentuale Distanzen: ${procentualDistances.map((d) => d.toStringAsFixed(2)).join(', ')}%");
 
+        print("Maximale Distanz: $maxDistance");
+        others.forEach((bm) {
+            print("Beacon: ${bm.beacon.name}, RSSI: ${bm.rssi}, Berechnete Distanz: ${bm.distance}, in prozentualer Relation zur maximalen Distanz: ${(bm.distance / maxDistance * 100).toStringAsFixed(2)}% distances");
+        });
 
         for (final section in sections) {
             if (listEquals(section.getSortedBeacons(), bs)) {
