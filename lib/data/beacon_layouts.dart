@@ -14,20 +14,11 @@ y|   |   |   |
 
 class BeaconsLayout {
     static const Map<String, Point3d> coordinates = {
-        "a": Point3d(0, 0, 0),
-        "b": Point3d(0, 20, 0),
-        "c": Point3d(20, 0, 0),
-        "d": Point3d(20, 20, 0),
+        "a": Point3d(  0,   0, 0),
+        "b": Point3d(100,   0, 0),
+        "c": Point3d(  0, 100, 0),
+        "d": Point3d(100, 100, 0),
     };
-
-    static double getDistance(String firstBeacon, String secondBeacon) {
-        final firstCoords = coordinates[firstBeacon];
-        final secondCoords = coordinates[secondBeacon];
-        if (firstCoords == null || secondCoords == null) {
-            throw ArgumentError('Invalid beacon names: $firstBeacon, $secondBeacon');
-        }
-        return firstCoords.distanceTo(secondCoords);
-    }
 
     static double getMaxDistance() {
         double maxDistance = 0;

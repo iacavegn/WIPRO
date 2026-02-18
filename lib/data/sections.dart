@@ -5,6 +5,9 @@ import '/data/beacons.dart';
 import '/models/beacon.dart';
 import '/models/beacon_measured.dart';
 import '/data/beacon_layouts.dart';
+import '/location/lateration.dart';
+import '/models/square.dart';
+import 'dart:math';
 
 /*    x
  |a--|---|--b|
@@ -23,30 +26,18 @@ class Sections {
     static final d = Beacons.getByName("d")!;
 
     static List<Section> sections = [
-        Section("A", {a: 0,b: 20,c: 20,d: 30, }, Colors.red),
-        Section("C", {a: 20,b: 0,c: 30,d: 20, }, Colors.yellow),
-        Section("G", {a: 20,b: 30,c: 0,d: 20, }, Colors.purple),
-        Section("I", {a: 30,b: 20,c: 20,d: 10, }, Colors.brown),
-    ];
-
-    static List<Section> sectionsB = [
-        Section("A", {a: 0,b: 2,c: 2,d: 3, }, Colors.red),
-        Section("B", {a: 1,b: 1,c: 2,d: 2, }, Colors.orange),
-        Section("C", {a: 2,b: 0,c: 3,d: 2, }, Colors.yellow),
-        Section("D", {a: 1,b: 2,c: 1,d: 2, }, Colors.green),
-        Section("E", {a: 1,b: 1,c: 1,d: 1, }, Colors.blue),
-        Section("F", {a: 2,b: 1,c: 2,d: 1, }, Colors.indigo),
-        Section("G", {a: 2,b: 3,c: 0,d: 2, }, Colors.purple),
-        Section("H", {a: 2,b: 2,c: 1,d: 1, }, Colors.teal),
-        Section("I", {a: 3,b: 2,c: 2,d: 1, }, Colors.brown),
+        Section("A", Square(Point(  0,   0), Point( 30, 30)), Colors.red),
+        Section("B", Square(Point( 30,   0), Point( 60, 30)), Colors.orange),
+        Section("C", Square(Point( 60,   0), Point( 90, 30)), Colors.yellow),
+        Section("D", Square(Point(  0,   0), Point( 30, 60)), Colors.green),
+        Section("E", Square(Point( 30,   0), Point( 60, 60)), Colors.blue),
+        Section("F", Square(Point( 60,   0), Point( 90, 60)), Colors.indigo),
+        Section("G", Square(Point(  0,   0), Point( 30, 90)), Colors.purple),
+        Section("H", Square(Point( 30,   0), Point( 60, 90)), Colors.teal),
+        Section("I", Square(Point( 60,   0), Point( 90, 90)), Colors.brown),
     ];
 
     static Section? getSection(List<BeaconMeasured> others) {
-        if (others.length != sections[1].beaconsWithDistances.length) return null;
-        
-        others.sort((a, b) => b.rssi.compareTo(a.rssi));
-        List<Beacon> bs = others.map((bm) => bm.beacon).toList();
-
         var maxDistance = BeaconsLayout.getMaxDistance();
 
         print("Maximale Distanz: $maxDistance");
@@ -54,8 +45,13 @@ class Sections {
             print("Beacon: ${bm.beacon.name}, RSSI: ${bm.rssi}, Berechnete Distanz: ${bm.distance}, in prozentualer Relation zur maximalen Distanz: ${(bm.distance / maxDistance * 100).toStringAsFixed(2)}% distances");
         });
 
+        final lateration = Lateration();
+        final position = lateration.solve(others);
+        print("Position: $position");
+
         for (final section in sections) {
-            if (listEquals(section.getSortedBeacons(), bs)) {
+            if (section.square.contains(position)) {
+                print("Position $position liegt in Section ${section.name}");
                 return section;
             }
         }
