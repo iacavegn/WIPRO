@@ -37,7 +37,7 @@ class MainPage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const BackgroundPage()),
             );
           },
-          child: const Text('C'),
+          child: const Text('Starten'),
         ),
       ),
     );

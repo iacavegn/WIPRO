@@ -17,7 +17,7 @@ class Beacons {
     final beacon = beacons?.firstWhere(
       (b) => b.id == id
     );
-    return beacon?.name; // gibt den Namen (place) zurück oder null, wenn nicht gefunden
+    return beacon?.name;
   }
 
   static Beacon? getByName(String name) {

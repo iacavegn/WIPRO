@@ -1,0 +1,157 @@
+import 'dart:math';
+
+/// Anchor in 3D space with measured distance
+class Anchor3D {
+  final double x;
+  final double y;
+  final double z;
+  final double distance;
+
+  const Anchor3D({
+    required this.x,
+    required this.y,
+    required this.z,
+    required this.distance,
+  });
+}
+
+/// Result position in 3D
+class Position3D {
+  final double x;
+  final double y;
+  final double z;
+
+  const Position3D(this.x, this.y, this.z);
+
+  @override
+  String toString() => 'Position3D(x: $x, y: $y, z: $z)';
+}
+
+/// Lateration solver for 3D anchors with a fixed tag height.
+///
+/// Use this when:
+/// - Anchors (A, B, C, D, ...) are in 3D
+/// - Distances are noisy / inconsistent (real-world sensors)
+/// - The tracked object always has a fixed height (e.g. z = 1.0)
+class Lateration {
+  final double fixedZ;
+  final int iterations;
+  final double learningRate;
+  const Lateration({
+    this.fixedZ = 1.0,
+    this.iterations = 800,
+    this.learningRate = 0.03,
+  });
+
+  Position3D solve(List<Anchor3D> anchors) {
+    if (anchors.length < 3) {
+      throw ArgumentError('At least 3 anchors are required for lateration.');
+    }
+
+    final initial = _centroid2D(anchors);
+
+    double x = initial.dx;
+    double y = initial.dy;
+    final double z = fixedZ;
+
+    for (int i = 0; i < iterations; i++) {
+      double gradX = 0.0;
+      double gradY = 0.0;
+
+      for (final anchor in anchors) {
+        final dx = x - anchor.x;
+        final dy = y - anchor.y;
+        final dz = z - anchor.z;
+
+        final predictedDist = sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (predictedDist == 0) continue;
+
+        final error = predictedDist - anchor.distance;
+
+        gradX += (error * dx) / predictedDist;
+        gradY += (error * dy) / predictedDist;
+      }
+
+      x -= learningRate * gradX;
+      y -= learningRate * gradY;
+    }
+
+    return Position3D(x, y, z);
+  }
+
+  /// Optional: weighted solve (better for noisy sensors like UWB/RSSI)
+  /// Higher weight = more trusted anchor
+  Position3D solveWeighted(
+    List<Anchor3D> anchors,
+    List<double> weights,
+  ) {
+    if (anchors.length != weights.length) {
+      throw ArgumentError('Anchors and weights must have the same length.');
+    }
+
+    if (anchors.length < 3) {
+      throw ArgumentError('At least 3 anchors are required for lateration.');
+    }
+
+    final initial = _centroid2D(anchors);
+
+    double x = initial.dx;
+    double y = initial.dy;
+    final double z = fixedZ;
+
+    for (int i = 0; i < iterations; i++) {
+      double gradX = 0.0;
+      double gradY = 0.0;
+
+      for (int j = 0; j < anchors.length; j++) {
+        final anchor = anchors[j];
+        final weight = weights[j];
+
+        final dx = x - anchor.x;
+        final dy = y - anchor.y;
+        final dz = z - anchor.z;
+
+        final predictedDist = sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (predictedDist == 0) continue;
+
+        final error = predictedDist - anchor.distance;
+
+        gradX += weight * (error * dx) / predictedDist;
+        gradY += weight * (error * dy) / predictedDist;
+      }
+
+      x -= learningRate * gradX;
+      y -= learningRate * gradY;
+    }
+
+    return Position3D(x, y, z);
+  }
+
+  Point _centroid2D(List<Anchor3D> anchors) {
+    double sumX = 0.0;
+    double sumY = 0.0;
+
+    for (final a in anchors) {
+      sumX += a.x;
+      sumY += a.y;
+    }
+
+    return Point(sumX / anchors.length, sumY / anchors.length);
+  }
+}
+
+/// Example usage inside Flutter / Dart:
+///
+/// final lateration = Lateration(fixedZ: 1.0);
+///
+/// final anchors = [
+///   Anchor3D(x: 0, y: 0, z: 2.5, distance: 4.2),
+///   Anchor3D(x: 10, y: 0, z: 2.0, distance: 6.1),
+///   Anchor3D(x: 5, y: 8, z: 2.2, distance: 5.0),
+///   Anchor3D(x: 8, y: 6, z: 3.0, distance: 4.8),
+/// ];
+///
+/// final position = lateration.solve(anchors);
+/// print(position);
