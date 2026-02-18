@@ -8,6 +8,7 @@ import 'data/sections.dart';
 import 'models/beacon.dart';
 import 'models/beacon_measured.dart';
 import 'models/measurement.dart';
+import 'location/location.dart';
 
 class BackgroundPage extends StatelessWidget {
   const BackgroundPage({Key? key}) : super(key: key);
@@ -36,6 +37,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   bool _isScanning = false;
   Color _bgColor = Colors.white;
   Timer? _timer;
+  Offset? _point;
 
   final int _amountOfBeaconsToFind = Beacons.getAmountOfBeacons();
 
@@ -77,6 +79,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
 
         setState(() {
           _bgColor = _getBackgroundColor();
+          _point = getPointFromLatestMeasurement();
         });
       },
     );
@@ -90,20 +93,25 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
     }
   }
 
+  Offset? getPointFromLatestMeasurement() {
+    final point = Location.getLocation(_setOfMeasurements);
+    if (point == null) return null;
+    return Offset(point.x, point.y);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Beispielpunkt bei x=60, y=80
     return Scaffold(
       backgroundColor: _bgColor,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final size = constraints.biggest;
-          final squareSide = size.shortestSide - 40; // Quadrat so groß wie die kleinere Dimension
+          final squareSide = size.shortestSide;
 
-          // Linke obere Ecke des Quadrats (zentriert)
           final offsetX = (size.width - squareSide) / 2;
           final offsetY = (size.height - squareSide) / 2;
 
-          // Skalierungsfaktor für 0-120 Koordinaten
           final scale = squareSide / 120;
 
           return Stack(
@@ -114,6 +122,14 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
                   scale: scale,
                   offsetX: offsetX,
                   offsetY: offsetY,
+                  point: _point,
+                ),
+              ),
+              Center(
+                child: Text(
+                  'Scanne nach Beacons...\nGefundene Messungen: ${_setOfMeasurements.length}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 24),
                 ),
               ),
             ],
@@ -124,16 +140,18 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   }
 }
 
-// CustomPainter für zentriertes 3x3 Quadrat
+// CustomPainter mit Punktanzeige
 class GridPainterCentered extends CustomPainter {
   final double scale;
   final double offsetX;
   final double offsetY;
+  final Offset? point; // Punkt optional
 
   GridPainterCentered({
     required this.scale,
     required this.offsetX,
     required this.offsetY,
+    this.point,
   });
 
   @override
@@ -154,37 +172,40 @@ class GridPainterCentered extends CustomPainter {
       canvas.drawLine(Offset(offsetX, y), Offset(offsetX + 120 * scale, y), paint);
     }
 
-    // Rahmen des Quadrats
+    // Rahmen
     canvas.drawRect(
       Rect.fromLTWH(offsetX, offsetY, 120 * scale, 120 * scale),
       paint..style = PaintingStyle.stroke,
     );
 
-    // Optional: Achsenbeschriftung
+    // Achsenbeschriftung
     final textPainter = TextPainter(
       textAlign: TextAlign.left,
       textDirection: TextDirection.ltr,
     );
-
     for (int i = 0; i <= 120; i += 40) {
-      // X-Achse
       textPainter.text = TextSpan(
         text: '$i',
         style: const TextStyle(fontSize: 12, color: Colors.black54),
       );
       textPainter.layout();
       textPainter.paint(canvas, Offset(offsetX + i * scale, offsetY - 14));
-
-      // Y-Achse
-      textPainter.text = TextSpan(
-        text: '$i',
-        style: const TextStyle(fontSize: 12, color: Colors.black54),
-      );
-      textPainter.layout();
       textPainter.paint(canvas, Offset(offsetX - 20, offsetY + i * scale));
+    }
+
+    // Punkt zeichnen, falls vorhanden
+    if (point != null) {
+      final pointPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+
+      // Punkt skalieren und verschieben
+      final x = offsetX + point!.dx * scale;
+      final y = offsetY + point!.dy * scale;
+      canvas.drawCircle(Offset(x, y), 6, pointPaint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

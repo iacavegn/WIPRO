@@ -24,6 +24,10 @@ class Sections {
     static final c = Beacons.getByName("c")!;
     static final d = Beacons.getByName("d")!;
 
+    // Sections are defined in a grid, that is 120x120 units big,
+    // 120 == 100%
+    // 120 was chosen, because 120 has many divisors, which makes it easier to split the area into sections
+    // But can be thought of as being 100%
     static List<Section> sections = [
         Section("A", Square(Point(  0,   0), Point( 40,  40)), Colors.red),
         Section("B", Square(Point( 40,   0), Point( 80,  40)), Colors.orange),
