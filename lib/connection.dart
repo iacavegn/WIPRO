@@ -7,6 +7,7 @@ import 'services/bluetooth_scan_service.dart';
 import 'data/sections.dart';
 import 'models/beacon.dart';
 import 'models/beacon_measured.dart';
+import 'models/measurement.dart';
 
 class BackgroundPage extends StatelessWidget {
   const BackgroundPage({Key? key}) : super(key: key);
@@ -30,11 +31,13 @@ class BluetoothScannerPage extends StatefulWidget {
 
 class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   final _scanService = BluetoothScanService();
-  final List<BeaconMeasured> _beacons = [];
+  final Set<Measurement> _setOfMeasurements = {};
 
   bool _isScanning = false;
   Color _bgColor = Colors.white;
   Timer? _timer;
+
+  final int _amountOfBeaconsToFind = Beacons.getAmountOfBeacons();
 
   late final List<String> _allowedIds;
 
@@ -42,7 +45,6 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   void initState() {
     super.initState();
     _allowedIds = Beacons.getAllIds();
-
     _startScan();
   }
 
@@ -56,18 +58,24 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   void _startScan() {
     if (_isScanning) return;
 
+    List<BeaconMeasured> beacons = [];
+
     _scanService.startScan(
       filter: (id) => _allowedIds.contains(id),
-      onScanningChanged: (scanning) {
-        setState(() => _isScanning = scanning);
-      },
+      amountOfDevicesToFind: _amountOfBeaconsToFind,
       onResults: (results) {
+        if (_setOfMeasurements.length >= 10) {
+          _setOfMeasurements.remove(_setOfMeasurements.first);
+        }
+        beacons
+          ..clear()
+          ..addAll(
+            results.map((b) => BeaconMeasured(Beacons.getById(b.device.id.id)!, b.rssi)),
+          );
+        _setOfMeasurements.add(Measurement(beacons));
+        print("Set of Measurements ${_setOfMeasurements.length}");
+
         setState(() {
-          _beacons
-            ..clear()
-            ..addAll(
-              results.map((b) => BeaconMeasured(Beacons.getById(b.device.id.id)!, b.rssi)),
-            );
           _bgColor = _getBackgroundColor();
         });
       },
@@ -75,11 +83,10 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   }
 
   Color _getBackgroundColor() {
-    if (_beacons.isEmpty) return _bgColor;
-    if (_beacons.length < Beacons.beacons.length) {
+    if (_setOfMeasurements.length == 5) {
       return _bgColor;
     } else {
-      return Sections.getSection(_beacons)?.color ?? _bgColor;
+      return Sections.getSection(_setOfMeasurements)?.color ?? _bgColor;
     }
   }
 
@@ -87,29 +94,12 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bgColor,
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _beacons.length,
-              itemBuilder: (_, index) {
-                final b = _beacons[index];
-                final beacon = b.beacon;
-                final name = beacon.name;
-                final id = beacon.id;
-                final place = beacon.name;
-                final d = b.distance;
-                final rssi = b.rssi;
-
-                return ListTile(
-                  title: Text(place),
-                  subtitle: Text(
-                      'RSSI: ${rssi} | Distanz: ${d.toStringAsFixed(2)} - ${name}'),
-                );
-              },
-            ),
-          ),
-        ],
+      body: Center(
+        child: Text(
+          'Scanne nach Beacons...\nGefundene Messungen: ${_setOfMeasurements.length}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 24),
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import '/models/beacon_measured.dart';
 import '/data/beacon_layouts.dart';
 import '/location/lateration.dart';
 import '/models/square.dart';
+import '/models/measurement.dart';
 import 'dart:math';
 
 /*    x
@@ -37,17 +38,39 @@ class Sections {
         Section("I", Square(Point( 80,  80), Point(120, 120)), Colors.brown),
     ];
 
-    static Section? getSection(List<BeaconMeasured> others) {
+    static Section? getSection(Set<Measurement> measurements) {
+        if (measurements.isEmpty) return null;
+
+        final beaconMap = <Beacon, int>{};
+        measurements.forEach((measurement) {
+            measurement.beacons.forEach((beaconMeasured) {
+                final existing = beaconMap[beaconMeasured.beacon];
+                if (existing != null) {
+                    beaconMap[beaconMeasured.beacon] = existing + beaconMeasured.rssi;
+                } else {
+                    beaconMap[beaconMeasured.beacon] = beaconMeasured.rssi;
+                }
+                
+            });
+        });
+
+        final averagedBeacons = beaconMap.entries.map((entry) {
+            final beacon = entry.key;
+            final values = entry.value;
+            final avgRssi = values / measurements.length;
+            return BeaconMeasured(beacon, avgRssi.toInt());
+        }).toList();
+
+        final others = measurements.toList().first.beacons;
         var maxDistance = BeaconsLayout.getMaxDistance();
 
-        print("Maximale Distanz: $maxDistance");
+        /*print("Maximale Distanz: $maxDistance");
         others.forEach((bm) {
             print("Beacon: ${bm.beacon.name}, RSSI: ${bm.rssi}, Berechnete Distanz: ${bm.distance}, in prozentualer Relation zur maximalen Distanz: ${(bm.distance / maxDistance * 100).toStringAsFixed(2)}% distances");
-        });
+        });*/
 
         final lateration = Lateration();
         final position = lateration.getPointFromDistancesAs1to120(others);
-        print("Position: $position");
 
         for (final section in sections) {
             if (section.square.contains(position)) {

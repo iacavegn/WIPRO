@@ -17,4 +17,8 @@ class BeaconMeasured {
         const int n = 3;
         return pow(10, (txPower - rssi) / (10 * n)).toDouble();
     }
+
+    @override
+    String toString() => 'BeaconMeasured(beacon: ${beacon.name}, rssi: $rssi, distance: ${distance.toStringAsFixed(2)} cm)'; 
 }
+

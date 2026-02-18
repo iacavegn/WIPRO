@@ -13,12 +13,12 @@ class Beacons {
     return beacons.map((beacon) => beacon.id).toList();
   }
 
-  static String? getNameById(String id) {
+  /*static String? getNameById(String id) {
     final beacon = beacons?.firstWhere(
       (b) => b.id == id
     );
     return beacon?.name;
-  }
+  }*/
 
   static Beacon? getByName(String name) {
     return beacons?.firstWhere(
@@ -32,10 +32,7 @@ class Beacons {
     );
   }
 
-  static const Map<String, int> rssiAt1m = {
-    "a": -65,
-    "b": -65,
-    "c": -65,
-    "d": -70,
-  };
+  static int getAmountOfBeacons() {
+    return beacons.length;
+  }
 }
