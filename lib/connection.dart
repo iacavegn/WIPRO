@@ -125,13 +125,6 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
                   point: _point,
                 ),
               ),
-              Center(
-                child: Text(
-                  'Scanne nach Beacons...\nGefundene Messungen: ${_setOfMeasurements.length}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 24),
-                ),
-              ),
             ],
           );
         },
