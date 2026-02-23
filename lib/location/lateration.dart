@@ -41,21 +41,19 @@ class Lateration {
         final predictedDist = sqrt(dx * dx + dy * dy + dz * dz);
 
         if (predictedDist == 0) continue;
-
-        final predictedPercentage = predictedDist / BeaconsLayout.getMaxDistance();;
-        final measuredPercentage = (beaconMeasure.distance / BeaconsLayout.getMaxDistance()).clamp(0.0, 1.0);
     
-        final errorPercentage = (predictedPercentage - measuredPercentage).abs() / measuredPercentage;
+        final error = (predictedDist - beaconMeasure.distance).abs() / beaconMeasure.distance;
 
-        gradX += ((errorPercentage * dx) / predictedPercentage) ;
-        gradY += ((errorPercentage * dy) / predictedPercentage);
+        gradX += ((error * dx) / predictedDist) ;
+        gradY += ((error * dy) / predictedDist);
       }
 
       x -= learningRate * gradX;
       y -= learningRate * gradY;
     }
-    
-    return Point(x, y);
+    double xInPercent = (x / BeaconsLayout.getMaxDistance()) * 100;
+    double yInPercent = (y / BeaconsLayout.getMaxDistance()) * 100;
+    return Point(xInPercent, yInPercent);
   }
 
   static Point getPointFromDistancesAs1to120(List<BeaconMeasured> beaconMeasurements) {

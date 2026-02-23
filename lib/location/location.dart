@@ -9,6 +9,8 @@ class Location {
         if (measurements.isEmpty) return null;
         final averagedBeacons = BeaconAverage.getAverageBeacon(measurements);
         if (averagedBeacons == null) return null;
+        
+        print("Point defacto: ${Lateration.solve(averagedBeacons)}");
 
         return Lateration.getPointFromDistancesAs1to120(averagedBeacons);
     } 
