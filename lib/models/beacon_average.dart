@@ -8,7 +8,7 @@ class BeaconAverage {
     static List<BeaconMeasured>? getAverageBeacon(Set<Measurement> measurements) {
         if (measurements.isEmpty) return null;
 
-        final alpha = 0.1; // Gewichtungsfaktor für den gleitenden Durchschnitt
+        final alpha = 0.2; // Gewichtungsfaktor für den gleitenden Durchschnitt
 
         final beaconMap = <Beacon, int>{};
         measurements.forEach((measurement) {

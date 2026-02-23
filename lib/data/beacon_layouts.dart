@@ -14,10 +14,10 @@ y|   |   |   |
 
 class BeaconsLayout {
     static const Map<String, Point3d> coordinates = {
-        "a": Point3d(   0,   0, 0),
-        "b": Point3d( 440,   0, 0),
-        "c": Point3d(   0, 210, 0),
-        "d": Point3d( 440, 210, 0),
+        "a": Point3d(   0,   0, 100),
+        "b": Point3d( 440,   0, 100),
+        "c": Point3d(   0, 210, 100),
+        "d": Point3d( 440, 210, 221),
     };
 
     static double getMaxDistance() {
