@@ -38,6 +38,7 @@ class Sections {
         Section("G", Square(Point(  0,  80), Point( 40, 120)), Colors.purple),
         Section("H", Square(Point( 40,  80), Point( 80, 120)), Colors.teal),
         Section("I", Square(Point( 80,  80), Point(120, 120)), Colors.brown),
+        Section("X", Square(Point(  0,   0), Point(1000000, 1000000)), Colors.grey)
     ];
 
     static Section? getSection(Set<Measurement> measurements) {

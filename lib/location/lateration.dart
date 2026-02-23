@@ -14,7 +14,7 @@ import '/data/beacon_layouts.dart';
 /// - Distances are noisy / inconsistent (real-world sensors)
 /// - The tracked object always has a fixed height (e.g. z = 1.0)
 class Lateration {
-  static final double fixedZ = 1.0; // Feste Höhe für die spätere Berechnung
+  static final double fixedZ = 100.0; // Feste Höhe für die spätere Berechnung
   static final int iterations = 800;
   static final double learningRate = 0.01;
 
@@ -42,7 +42,7 @@ class Lateration {
 
         if (predictedDist == 0) continue;
 
-        final predictedPercentage = predictedDist / BeaconsLayout.getMaxDistance();
+        final predictedPercentage = predictedDist / BeaconsLayout.getMaxDistance();;
         final measuredPercentage = (beaconMeasure.distance / BeaconsLayout.getMaxDistance()).clamp(0.0, 1.0);
     
         final errorPercentage = (predictedPercentage - measuredPercentage).abs() / measuredPercentage;

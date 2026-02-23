@@ -75,7 +75,7 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
             results.map((b) => BeaconMeasured(Beacons.getById(b.device.id.id)!, b.rssi)),
           );
         _setOfMeasurements.add(Measurement(beacons));
-        print("Set of Measurements ${_setOfMeasurements.length}");
+        //print("Set of Measurements ${_setOfMeasurements.length}");
 
         setState(() {
           _bgColor = _getBackgroundColor();
@@ -95,7 +95,11 @@ class _BluetoothScannerPageState extends State<BluetoothScannerPage> {
 
   Offset? getPointFromLatestMeasurement() {
     final point = Location.getLocation(_setOfMeasurements);
+    print("Anzahl der Messungen: ${_setOfMeasurements.length}");
     if (point == null) return null;
+    if (point.x < 0 || point.x > 120 || point.y < 0 || point.y > 120) {
+      print("Warnung: Berechneter Punkt liegt ausserhalb des Bereichs: $point");
+    }
     return Offset(point.x, point.y);
   }
 
